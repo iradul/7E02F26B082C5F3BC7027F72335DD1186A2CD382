@@ -1,6 +1,6 @@
 ## Assignment
 
-* presentation is available in `presentation.pdf`
+* presentation is available in [`presentation.pdf`](https://github.com/iradul/7E02F26B082C5F3BC7027F72335DD1186A2CD382/blob/master/presentation.pdf)
 * deployment is executed with  **Aiven CLI** scripts
 
 ## Aiven CLI
@@ -13,10 +13,10 @@ docker run -ti --rm avn bash
 
 Login
 ```sh
-avn  user login iradul@gmail.com
+avn user login YOUR_EMAIL
 ```
 
-**Scripts below must be updated with appropriate desired/optimal setup.**
+**Scripts below must be updated with appropriate settings.**
 
 ### Create project
 
@@ -52,7 +52,7 @@ Create `in_pricing` inbound topic for pricing ingestion
 avn service topic-create --partitions 3 --replication 3 --retention 604800000 --cleanup-policy delete kafka-avn in_pricing
 ```
 
-Create sink to write pricing/analitics to Postgres
+Create sink to write pricing/analytics to Postgres **
 ```sh
 # create sink config (this needs more work)
 cat << 'EOF' >> kafka_jdbc_sink_pg.json
@@ -70,3 +70,31 @@ EOF
 # create sink service
 avn service connector create kafka-avn @kafka_jdbc_sink_pg.json
 ```
+
+Create source connector for third party integration **
+```
+# create source config (this needs more work)
+cat << 'EOF' >> kafka_jdbc_source_xyz.json
+{
+    "name": "pg-source_xyz",
+    "connector.class": "io.aiven.connect.jdbc.JdbcSourceConnector",
+    "connection.url": "CONNECT_URL",
+    "connection.user": "USN",
+    "connection.password": "PWD",
+    "mode":"incrementing",
+    "topic.prefix":"jdbc_source_pg_increment.",
+    "poll.interval.ms":"5000",
+    "timestamp.delay.interval.ms":"1000",
+    "batch.max.rows":"1"
+}
+EOF
+# create source connector service
+avn service connector create kafka-avn @kafka_jdbc_source_xyz.json
+```
+
+## Notes
+
+* The scripts are covering only the first stage of modernization.
+* The scripts are not complete and should be used for demonstration purposes only, additional work is required for production setup.
+* Flink deployment is not included.
+
